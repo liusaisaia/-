@@ -29,12 +29,12 @@ export default {
     return {
       cardList: [
         {
-          img: require('../assets/fonts/yonghu.png'),
+          img: require('@/assets/fonts/yonghu.png'),
           name: '用户来访',
           num: 1113
         },
         {
-          img: require('../assets/fonts/lishi.png'),
+          img: require('@/assets/fonts/lishi.png'),
           name: '历史记录',
           num: 4321
         },

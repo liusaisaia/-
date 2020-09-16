@@ -11,4 +11,7 @@ export default {
 </script>
 
 <style>
+.el-table th.gutter{
+  display: table-cell!important;
+}
 </style>

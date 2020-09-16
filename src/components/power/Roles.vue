@@ -138,7 +138,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editorDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editorDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="editorDialog">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -168,7 +168,9 @@ export default {
       // 角色名称
       editorName: '',
       // 角色描述
-      editorMain: ''
+      editorMain: '',
+      // 当前编辑角色id
+      editorId: '',
     };
   },
   created() {
@@ -184,7 +186,6 @@ export default {
       }
 
       this.roleList = res.data;
-      console.log(this.roleList);
     },
 
     // 根据id删除权限
@@ -208,7 +209,6 @@ export default {
         `roles/${role.id}/rights/${rightId}`
       );
       if (res.meta.status !== 200) {
-        console.log(res);
         return this.$message.error('删除权限失败！');
       }
       role.children = res.data;
@@ -296,22 +296,35 @@ export default {
       this.$message.success('删除角色成功！');
       this.getRolesList();
     },
-    // 编辑角色信息
+    // 编辑角色信息 赋值
     async editorRoleOpen(e) {
       this.editorDialogVisible = true;
       this.editorName = e.roleName;
       this.editorMain = e.roleDesc;
-      // const { data: res } = await this.$http.put(
-      //   `roles/` + id
-      // )
+      this.editorId = e.id;
     },
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
           done();
-          console.log(1111);
         })
         .catch(_ => {});
+    },
+    // 更改角色信息
+    async editorDialog() {
+      const { data: res } = await this.$http.put(
+        `roles/` + this.editorId,
+        {
+          roleName: this.editorName,
+          roleDesc: this.editorMain
+        }
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error('编辑角色失败！');
+      }
+      this.$message.success('编辑角色成功！');
+      this.getRolesList();
+      this.editorDialogVisible = false;
     }
   }
 };
@@ -343,6 +356,8 @@ export default {
 
   span {
     display: block;
+    width: 100px;
+    line-height:40px;
   }
 }
 </style>
