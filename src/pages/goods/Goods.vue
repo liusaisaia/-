@@ -26,7 +26,7 @@
           </el-input>
         </el-col>
         <el-col :span="5">
-          <el-button type="primary" @click="AddDialogVisible = true"
+          <el-button type="primary" @click="AddDialogVisible = true, goodCat = true"
             >添加商品</el-button
           >
         </el-col>
@@ -105,7 +105,7 @@
         <el-form-item label="商品名称">
           <el-input v-model="form.goods_name"></el-input>
         </el-form-item>
-        <el-form-item label="分类">
+        <el-form-item label="分类" v-if="goodCat">
           <el-input v-model="form.goods_cat"></el-input>
         </el-form-item>
         <el-form-item label="价格" prop="addNumber">
@@ -176,7 +176,9 @@ export default {
           { validator: addNumber, trigger: 'blur' }
         ]
       },
-      total: 0
+      total: 0, // 总页数
+      goodCat: true, // 分类框状态
+      etditId: '', // 存储修改id
     };
   },
   filters: {},
@@ -241,7 +243,7 @@ export default {
       if (!this.form.goods_name) {
         return this.$message.error('商品名称不能为空！');
       }
-      if (!this.form.goods_cat) {
+      if (!this.form.goods_cat && this.goodCat) {
         return this.$message.error('商品分类不能为空！');
       }
       if (!this.form.goods_price) {
@@ -253,21 +255,39 @@ export default {
       if (!this.form.goods_weight) {
         return this.$message.error('商品重量不能为空！');
       }
-      const params = {
-        goods_name: this.form.goods_name,
-        goods_cat: '1,2,3',
-        goods_price: Number(this.form.goods_price),
-        goods_number: Number(this.form.goods_number),
-        goods_weight: Number(this.form.goods_weight),
-        goods_introduce: this.form.goods_introduce,
-        pics: [],
-        attrs: []
-      };
-      const { data: res } = await this.$http.post('goods', params);
-      if (res.meta.status !== 201) {
-        return this.$message.error(res.meta.msg);
+      if (this.goodCat) {
+        const params = {
+          goods_name: this.form.goods_name,
+          goods_cat: '1,2,3',
+          goods_price: Number(this.form.goods_price),
+          goods_number: Number(this.form.goods_number),
+          goods_weight: Number(this.form.goods_weight),
+          goods_introduce: this.form.goods_introduce,
+          pics: [],
+          attrs: []
+        };
+        const { data: res } = await this.$http.post('goods', params);
+        if (res.meta.status !== 201) {
+          return this.$message.error(res.meta.msg);
+        }
+        this.$message.success('添加商品成功！');
+      } else {
+        const params = {
+          goods_name: this.form.goods_name,
+          goods_cat: '1,2,3',
+          goods_price: Number(this.form.goods_price),
+          goods_number: Number(this.form.goods_number),
+          goods_weight: Number(this.form.goods_weight),
+          goods_introduce: this.form.goods_introduce,
+          pics: [],
+          attrs: []
+        };
+        const { data: res } = await this.$http.put('goods/' + this.etditId , params);
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg);
+        }
+        this.$message.success('修改商品成功！');
       }
-      this.$message.success('添加商品成功！');
       this.form = {
         goods_name: '',
         goods_cat: '',
@@ -297,6 +317,7 @@ export default {
         item.upd_time = this.getLocalTime(item.upd_time);
       });
     },
+    // 删除商品列表
     async deleteRole(e) {
       const id = e.goods_id;
       const confirmResult = await this.$confirm(
@@ -322,6 +343,14 @@ export default {
       }
       this.$message.success('删除商品成功！');
       this.getGoodsList();
+    },
+    // 编辑商品
+    editorRoleOpen(e) {
+      this.AddDialogVisible = true;
+      this.goodCat = false;
+      this.form = e;
+      this.etditId = e.goods_id;
+
     }
   }
 };
