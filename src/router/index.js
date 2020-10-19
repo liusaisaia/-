@@ -9,6 +9,8 @@ import Roles from '../components/power/Roles';
 import Cate from '../pages/goods/Cate';
 import Params from '../pages/goods/params';
 import Goods from '../pages/goods/Goods';
+import Orders from '../pages/orderManage/orderList';
+import Reports from '../pages/reports/index';
 
 Vue.use(VueRouter);
 
@@ -60,6 +62,14 @@ const router = new VueRouter({
         {
           path: '/goods',
           component: Goods
+        },
+        {
+          path: '/orders',
+          component: Orders
+        },
+        {
+          path: '/reports',
+          component: Reports
         }
       ]
     }
